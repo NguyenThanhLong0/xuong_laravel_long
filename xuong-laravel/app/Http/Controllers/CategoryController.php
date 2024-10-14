@@ -8,32 +8,42 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-
-
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::query()->latest('id')->get();
+        $categories = Category::query()->latest('id')->paginate(5);
 
-        return view('client.master', compact('categories'));
+
+        // Kiểm tra nếu truy cập từ trang admin hoặc client
+        if ($request->is('admin/*')) {
+            // Trả về trang admin
+            return view('admin.categories.index', compact('categories'));
+        } else {
+            // Trả về trang client
+            return view('client.master', compact('categories'));
+        }
+    }
+
+    public function create()
+    {
+        return view('admin.categories.create');
     }
 
 
     public function store(Request $request)
     {
-        // Validate dữ liệu
         $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
         try {
-            // Lấy dữ liệu
+
             $data = $request->only(['name']);
 
-            // Tạo mới category
+  
             Category::create($data);
 
-            return redirect()->route('categories.index')
-                ->with('success', 'Thêm mới tahnhf công!');
+            return redirect()->route('admin.categories.index')
+                ->with('success', 'Thêm mới thành công!');
         } catch (\Throwable $th) {
             return back()->with('error', 'Thêm mới thất bại!');
         }
@@ -44,8 +54,11 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        $category = Category::with('posts')->findOrFail($id); // Lấy danh mục kèm theo các bài viết
-        return view('client.index', compact('category')); // Trả về view với danh mục
+
+
+        $category = Category::with('posts')->findOrFail($id); 
+
+        return view('client.index', compact('category')); 
     }
 
     /**
@@ -53,7 +66,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        return view('categories.edit', compact('category'));
+        return view('admin.categories.edit', compact('category'));
     }
 
     /**
@@ -73,7 +86,7 @@ class CategoryController extends Controller
             // Cập nhật category
             $category->update($data);
 
-            return redirect()->route('categories.index')
+            return redirect()->route('admin.categories.index')
                 ->with('success', 'Cập nhật thành công!');
         } catch (\Throwable $th) {
             return back()->with('error', 'Cập nhật thất bại!');
@@ -88,22 +101,31 @@ class CategoryController extends Controller
         try {
             $category->delete();
 
-            return redirect()->route('categories.index')
-                ->with('success', 'Xóa thành công!');
+            return back()->with('success', 'Thao tác thành công!');
         } catch (\Throwable $th) {
             return back()->with('error', 'Xóa thất bại!');
         }
     }
-    public function filterByCategory($id)
+    // public function filterByCategory($id)
+    // {
+
+    //     // Lógica để lấy bài viết theo danh mục
+    //     $posts = Post::where('category_id', $id)->latest()->get();
+    //     $categories = Category::latest('id')->get();
+    //     $trendingPosts = Post::with('author')->latest()->take(5)->get();
+
+    //     return view('client.index', compact('posts', 'categories', 'trendingPosts'));
+    // }
+
+    public function filter($id)
     {
-        // $posts = Post::with('category', 'author')->where('category_id', $id)->get(); // Lấy bài viết theo danh mục
-        // $categories = Category::all(); // Lấy tất cả danh mục
-        // return view('client.index', compact('posts', 'categories')); // Truyền cả hai biến vào view
-
-        // Lógica để lấy bài viết theo danh mục
-        $posts = Post::where('category_id', $id)->latest()->get();
         $categories = Category::latest('id')->get();
+        $posts = Post::where('category_id', $id)->with(['author'])->latest()->get();
 
-        return view('client.index', compact('posts', 'categories'));
+
+        $trendingPosts = Post::with('author')->latest()->take(5)->get();
+
+        // Truyền các biến vào view
+        return view('client.index', compact('categories', 'posts', 'trendingPosts'));
     }
 }

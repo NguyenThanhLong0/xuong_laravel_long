@@ -9,19 +9,6 @@
             <li><a href="{{ route('home') }}">Blog</a></li>
             <li><a href="single-post.html">Single Post</a></li>
 
-            {{-- <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    categories
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    @foreach ($categories as $category)
-                        <li><a class="dropdown-item"
-                                href="{{ route('categories.show', $category->id) }}">{{ $category->name }}</a></li>
-                    @endforeach
-                </ul>
-            </li> --}}
-
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                     data-bs-toggle="dropdown" aria-expanded="false">
@@ -38,8 +25,8 @@
 
 
 
-            <li><a href="about.html">About</a></li>
-            <li><a href="contact.html">Contact</a></li>
+            <li><a href="{{ route('abouts') }}">About</a></li>
+            <li><a href="{{ route('contacts') }}">Contact</a></li>
         </ul>
     </nav>
 

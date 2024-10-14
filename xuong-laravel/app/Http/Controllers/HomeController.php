@@ -23,12 +23,46 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+
     public function index()
     {
-        // return view('client.index');
 
-        $posts = Post::with('category', 'author')->latest()->get(); // Lấy danh sách bài viết mới nhất
-        $categories = Category::all(); // Lấy tất cả danh mục
-        return view('client.index', compact('posts', 'categories')); // Truyền cả hai biến vào view
+        $posts = Post::with('category', 'author')->latest()->get();
+
+        $categories = Category::all();
+
+        $trendingPosts = Post::with('author')->latest()->take(5)->get();
+
+        // Truyền cả ba biến vào view
+        return view('client.index', compact('posts', 'categories', 'trendingPosts'));
+    }
+
+    public function showPost($id)
+    {
+
+        $post = Post::findOrFail($id);
+
+        $categories = Category::latest('id')->get();
+
+        $trendingPosts = Post::with('author')->latest()->take(5)->get();
+
+
+        return view('client.single-post', compact('post', 'categories', 'trendingPosts'));
+    }
+
+    public function about()
+    {
+
+        $categories = Category::latest('id')->get();
+
+        return view('client.abouts.about', compact('categories'));
+    }
+
+    public function contact()
+    {
+
+        $categories = Category::latest('id')->get();
+
+        return view('client.contacts.contact', compact('categories'));
     }
 }

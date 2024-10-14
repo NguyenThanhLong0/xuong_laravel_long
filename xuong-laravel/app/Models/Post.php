@@ -41,8 +41,12 @@ class Post extends Model
     }
 
     public function mainImage()
-{
-    return $this->img_cover; // Hoặc tên trường mà bạn lưu trữ đường dẫn ảnh
-}
+    {
+        return $this->img_cover;
+    }
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }
